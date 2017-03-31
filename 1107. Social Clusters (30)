@@ -1,0 +1,91 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<vector>
+#include<queue>
+#include<algorithm>
+using namespace std;
+
+
+int visit[1001];//访问过的人
+vector<int> hobbies[1001];//每个爱好有那些人
+vector<int> person[1001];//每个人的爱好
+
+vector<int>res;
+
+
+void bfs(int perosn_index)
+{
+	queue<int>q;
+	q.push(perosn_index);
+	visit[perosn_index] = 1;
+	int cnt = 0;
+	while (!q.empty()) {
+		
+		int ren = q.front();
+		q.pop();
+		
+		cnt++;
+		for (int i = 0; i < person[ren].size(); i++) {//这个人的所有爱好 
+			
+			int temp = person[ren][i];
+			for (int j = 0; j < hobbies[temp].size(); j++) {//喜欢这个爱好的别的人
+				
+
+				int p = hobbies[temp][j];
+
+				if (visit[p] == 1)
+					continue;
+				q.push(p);
+				visit[p] = 1;
+			}
+			
+		}
+	
+	}
+	res.push_back(cnt);
+}
+int main()
+{
+	int N;
+	scanf("%d", &N);
+
+	
+	for (int i = 1; i <= N; i++) {
+		int k;
+		scanf("%d:", &k);
+		for (int j = 0; j < k; j++) {
+			int index;
+			scanf("%d", &index);
+			hobbies[index].push_back(i);
+
+			person[i].push_back(index);
+		}
+	}
+
+	
+	for (int i = 0; i < 1001; i++)
+		visit[i] = 0;
+	
+	
+
+	int num = 0;
+	for (int i = 1; i <= N; i++) {
+		
+		if (visit[i] == 0) {
+			bfs(i);
+			num++;
+		}
+	}
+	sort(res.begin(), res.end());
+
+	printf("%d\n", num);
+	for (int i = res.size() - 1; i >= 0; i--)
+		if (i == res.size() - 1)
+			printf("%d", res[i]);
+		else
+			printf(" %d", res[i]);
+
+	system("pause");
+	return 0;
+}
