@@ -1,0 +1,91 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+#include<vector>
+#include<algorithm>
+
+using namespace std;
+
+int check(char str[])
+{
+	int pointNum = 0;
+	int minus = 0;
+	int flag = 0;
+
+	if (str[0] == '.')
+		return 0;
+
+
+	for (int i = 0; i < strlen(str); i++) {
+
+		if (str[i] == '.') {
+			
+			if (pointNum != 0)
+				return 0;
+			else {
+			
+				pointNum = i;
+				continue;
+			}
+		}
+		
+		if (str[i] == '-') {
+
+			if (i != 0)
+				return 0;
+
+			continue;
+		}
+
+		if (str[i] < '0' || str[i] > '9')
+			return 0;
+
+		if (pointNum != 0) {
+
+			flag++;
+			if (flag == 3)
+				return 0;
+
+		}
+		
+	}
+
+	return 1;
+}
+int main()
+{
+	int N;
+	scanf("%d", &N);
+
+	char temp[100];
+	vector<double>res;
+
+	for (int i = 0; i < N; i++) {
+		
+		scanf("%s", temp);
+
+		if (check(temp) == 1 && (atof(temp) >= -1000.0 && atof(temp) <= 1000.0)) 
+			res.push_back(atof(temp));
+		else
+			printf("ERROR: %s is not a legal number\n", temp);
+
+	}
+	if (res.size() == 0)
+		printf("The average of 0 numbers is Undefined\n");
+	else if (res.size() == 1)
+		printf("The average of 1 number is %.2lf", res[0]);
+	else {
+		double avg = 0;
+		for (int i = 0; i < res.size(); i++)
+			avg += res[i];
+		avg /= res.size();
+
+		printf("The average of %d numbers is %.2lf", res.size(), avg);
+	}
+
+
+	system("pause");
+	return 0;
+}
