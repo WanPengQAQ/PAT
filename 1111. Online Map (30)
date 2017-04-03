@@ -1,0 +1,246 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<vector>
+#include<queue>
+using namespace std;
+#define MAX 600
+#define INF 99999999
+
+int dis[MAX][MAX], time[MAX][MAX];
+
+struct node {
+	int visit, path, distance, timeCost;
+
+};
+
+vector<int>temppath, Tpath;
+vector<int> res;
+vector<int>path[MAX];
+int minnode = INF;
+void dfsTimePath(int v,int S)
+{
+	temppath.push_back(v);
+
+	if (v == S) {
+		
+		if (temppath.size() < minnode) {
+			minnode = temppath.size();
+			Tpath = temppath;
+		}
+		temppath.pop_back();
+		return;
+
+	}
+
+	for (int i = 0; i < path[v].size(); i++)
+		dfsTimePath(path[v][i], S);
+
+	temppath.pop_back();
+
+}
+int minTime(int S, int V, int N)
+{
+	struct node a[MAX];
+	
+	
+	for (int i = 0; i < N; i++) {
+		a[i].visit = 0;
+		a[i].timeCost = INF;
+	}
+
+	a[S].timeCost = 0;
+	
+
+	while (1) {
+		int v = -1;
+		int tempTime = INF;
+		for (int i = 0; i < N; i++)
+			if (a[i].visit == 0 && a[i].timeCost < tempTime) {
+				tempTime = a[i].timeCost;
+				v = i;
+			}
+
+		if (v == -1)
+			break;
+
+		a[v].visit = 1;
+
+		for (int w = 0; w < N; w++) {
+			
+			if (time[v][w] != -1 && a[w].visit == 0) {//存在边 并且没有访问
+			
+				if (a[v].timeCost + time[v][w] < a[w].timeCost) {
+					
+					a[w].timeCost = a[v].timeCost + time[v][w];
+					
+					path[w].clear();
+					path[w].push_back(v);
+					
+				}
+				else if (a[v].timeCost + time[v][w] == a[w].timeCost) {
+					
+					path[w].push_back(v);
+				}
+			}
+
+
+		}
+
+	}
+
+	dfsTimePath(V, S);
+
+
+
+	return a[V].timeCost;
+	
+
+}
+
+
+int minDis(int S, int V, int N)
+{//路径最短 路径相同选最快的
+	struct node a[MAX];
+	for (int i = 0; i < N; i++) {
+		a[i].visit = 0;
+		a[i].distance = a[i].timeCost = INF;
+	}
+
+	a[S].distance = 0;
+	a[S].timeCost = 0;
+	a[S].path = -1;
+	while (1) {
+		int v = -1;
+		int tempdis = INF;
+		for (int i = 0; i < N; i++) //未知的 disance最小的结点
+			if (a[i].visit == 0   &&  a[i].distance < tempdis) {
+				tempdis = a[i].distance;
+				v = i;
+			}
+		
+		if (v == -1)
+			break;
+
+		a[v].visit = 1;
+
+		for (int w = 0; w < N; w++) {
+
+			if (dis[v][w] != -1  &&  a[w].visit == 0) {//必须存在这么一条边 并且没有收录
+
+				if (a[v].distance + dis[v][w] < a[w].distance) {//有小的边
+
+					a[w].distance = a[v].distance + dis[v][w];
+					a[w].path = v;
+					a[w].timeCost = a[v].timeCost + time[v][w];
+				}
+				else if (a[v].distance + dis[v][w] == a[w].distance) {//相等的边
+				
+					if (a[v].timeCost + time[v][w] < a[w].timeCost) {//选择时间最短的边
+						
+						a[w].path = v;
+						a[w].timeCost = a[v].timeCost + time[v][w];
+					}
+				}
+			
+			}
+		}
+
+	}
+
+
+	// S -> ... -> V
+	
+	int tempV = V;
+
+	
+	res.push_back(tempV);
+	while (a[tempV].path != -1) {
+		res.push_back(a[tempV].path);
+		tempV = a[tempV].path;
+	}
+
+
+	return a[V].distance;
+}
+int main()
+{
+	int N, M;
+	scanf("%d%d", &N, &M);
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < N; j++) {
+			dis[i][j] = -1;
+			time[i][j] = -1;
+		}
+	
+	for (int i = 0; i < M; i++) {
+		int v1, v2, oneway, length, t;
+		scanf("%d%d%d%d%d", &v1, &v2, &oneway, &length, &t);
+
+		dis[v1][v2] = length;
+		time[v1][v2] = t;
+
+		if (oneway == 0) {
+			dis[v2][v1] = length;
+			time[v2][v1] = t;
+		}
+
+	}
+
+	int S, target;
+	scanf("%d%d", &S, &target);
+
+	int d = minDis(S, target, N);
+
+	int t = minTime(S, target, N);
+
+	int flag = 1;
+
+	if (res.size() == Tpath.size()) {
+		for(int i = 0;i <res.size();i++)
+			if (res[i] != Tpath[i]) {
+				flag = 0;
+				break;
+			}
+	}
+	else if (res.size() != Tpath.size()) {
+		flag = 0;
+	}
+
+	if (flag == 1) {
+	
+		printf("Distance = %d; Time = %d: ", d, t);
+		for (int i = res.size() - 1; i >= 0; i--) {
+			if (i == res.size() - 1)
+				printf("%d", res[i]);
+			else
+				printf(" -> %d", res[i]);
+		}
+
+	}
+	else {
+	
+		printf("Distance = %d: ", d);
+		for (int i = res.size() - 1; i >= 0; i--) {
+			if (i == res.size() - 1)
+				printf("%d", res[i]);
+			else
+				printf(" -> %d", res[i]);
+		}
+	
+		printf("\n");
+
+		printf("Time = %d: ",t);
+		for (int i = Tpath.size() - 1; i >= 0; i--) {
+			if (i == Tpath.size() - 1)
+				printf("%d", Tpath[i]);
+			else
+				printf(" -> %d", Tpath[i]);
+		}
+	}
+
+
+
+	system("pause");
+	return 0;
+}
