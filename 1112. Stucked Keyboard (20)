@@ -1,0 +1,87 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<vector>
+#include<queue>
+using namespace std;
+
+
+int main()
+{
+	int k;
+	scanf("%d", &k);
+
+	char str[1010];
+	scanf("%s", str);
+
+	int length = strlen(str);
+
+	int hashtable[300];
+	for (int i = 0; i < 300; i++)
+		hashtable[i] = 0;
+
+	
+
+	for (int i = 0; i < length; i++)
+		hashtable[str[i]]++;
+
+	for (int i = 0; i < length - k; ) {
+		
+		char temp = str[i];
+		int flag = 1;//k连个
+		for (int j = i; j < i + k ; j++) {
+			
+			if (str[j] != temp) {
+				flag = 0;
+				break;
+			}
+
+		}
+
+		if (flag == 0) {
+			hashtable[temp] = 0;
+			i++;
+		}
+		else
+			i += k;
+	}
+
+	//for (int i = length - k + 1; i < length; i++)
+	//	hashtable[str[i]] = 0;
+
+	vector<char> res;
+
+	for (int i = 0; i < length; i++) {
+		
+		if (hashtable[str[i]] == 0 || hashtable[str[i]] == -1)
+			continue;
+		else  {
+			res.push_back(str[i]);
+			hashtable[str[i]] = -1;
+		}
+	}
+
+	for (int i = 0; i < res.size(); i++)
+		if (i == 0)
+			printf("%c", res[i]);
+		else
+			printf("%c", res[i]);
+
+	printf("\n");
+	for (int i = 0; i < length; ) {
+		char temp = str[i];
+		if (hashtable[str[i]] == 0) {
+			printf("%c", str[i]);
+			i++;
+		}
+		else  {
+			printf("%c", str[i]);
+			i += k;
+		}
+
+	}
+		
+	system("pause");
+	return 0;
+}
