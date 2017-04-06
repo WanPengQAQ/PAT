@@ -1,0 +1,113 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<queue>
+using namespace std;
+#define MAX 1000
+
+
+typedef struct Tnode* Tree;
+struct Tnode {
+	int key; 
+	Tree left, right;
+	int level;
+};
+
+Tree insert(int key, Tree Root) {
+	
+
+	if (Root == NULL) {
+		Root = (Tree)malloc(sizeof(struct Tnode));
+		Root->key = key;
+		Root->left = Root->right = NULL;
+	}
+	else if (key <= Root->key) {
+		Root->left = insert(key, Root->left);
+	}
+	else
+		Root->right = insert(key, Root->right);
+
+	return Root;
+}
+
+int n1 = 0;
+void n1preOrder(Tree Root,int level) {
+	if (Root != NULL) {
+		
+		n1preOrder(Root->left, level);
+		if (Root->level == level)
+			n1++;
+		n1preOrder(Root->right, level);
+	}
+}
+
+int n2 = 0;
+void n2preOrder(Tree Root, int level) {
+	if (Root != NULL) {
+
+		n2preOrder(Root->left, level);
+		if (Root->level == level)
+			n2++;
+		n2preOrder(Root->right, level);
+	}
+}
+
+int levelOrder(Tree Root)
+{
+	queue<Tree>q;
+	q.push(Root);
+
+	Tree last, next;
+	last = Root; next = NULL;
+	int level = 1;
+
+	while (!q.empty()) {
+		Tree temp = q.front();
+		q.pop();
+
+		temp->level = level;
+
+		if (temp->left) {
+			q.push(temp->left);
+			next = temp->left;
+		}
+
+		if (temp->right) {
+			q.push(temp->right);
+			next = temp->right;
+		}
+
+		if (temp == last) {
+			level++;
+			last = next;
+		}
+
+	}
+
+	return level;
+}
+int main()
+{
+	int N;
+	scanf("%d", &N);
+
+	Tree BST = NULL;
+	for (int i = 0; i < N; i++) {
+		int temp;
+		scanf("%d", &temp);
+
+		BST = insert(temp, BST);
+
+	}
+
+	
+
+	int level = levelOrder(BST);
+
+	n1preOrder(BST, level - 1);
+	n2preOrder(BST, level - 2);
+	
+	printf("%d + %d = %d", n1, n2, n1 + n2);
+
+	return 0;
+}
