@@ -1,0 +1,73 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+using namespace std;
+#define MAX 1000
+
+
+int isPrime(int num)
+{
+	for (int i = 2; i <= sqrt(num); i++) {
+	
+		if (num % i == 0)
+			return 0;
+	}
+	return 1;
+}
+
+struct node {
+	int id, sta, order;//1 是存在成绩 0 不存在 -1已经查询过
+};
+
+int main()
+{
+	int N;
+	scanf("%d", &N);
+
+	struct node  *saveSta = (struct node *)malloc(sizeof(struct node) * 10000);
+	
+	for (int i = 1; i <= N; i++) {
+		int temp;
+		scanf("%d", &temp);
+
+		saveSta[temp].id = temp;
+		saveSta[temp].order = i;
+		saveSta[temp].sta = 1;
+	}
+		
+	int K;
+	scanf("%d", &K);
+
+	for (int i = 0; i < K; i++) {
+		int temp;
+		scanf("%d", &temp);
+
+		if (saveSta[temp].sta == -1)
+			printf("%04d: Checked\n", temp);
+		else if (saveSta[temp].sta == 1) {
+			
+			if (saveSta[temp].order == 1) {
+				printf("%04d: Mystery Award\n", temp);
+				saveSta[temp].sta = -1;
+			}
+			else if (isPrime(saveSta[temp].order)) {
+				printf("%04d: Minion\n", temp);
+				saveSta[temp].sta = -1;
+			}
+			else {
+				printf("%04d: Chocolate\n", temp);
+				saveSta[temp].sta = -1;
+			}
+
+		}
+		else
+			printf("%04d: Are you kidding?\n", temp);
+
+	}
+
+
+
+
+	return 0;
+}
