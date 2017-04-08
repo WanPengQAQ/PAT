@@ -1,0 +1,88 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+#define MAX 10010
+
+struct node {
+	int parent;//是根 保存有几个儿子  
+	
+};
+
+int find(int* parent, int x)
+{
+	if (parent[x] < 0)
+		return x;
+	else
+		return parent[x] = find(parent, parent[x]);
+}
+
+void Union(int* parent, int Root1, int Root2)
+{//-5  -10
+
+	Root1 = find(parent, Root1);
+	Root2 = find(parent, Root2);
+
+	if (Root1 == Root2)
+		return;
+
+	if (parent[Root1] > parent[Root2]) {
+		parent[Root2] += parent[Root1];
+		parent[Root1] = Root2;
+	}
+	else {
+		parent[Root1] += parent[Root2];
+		parent[Root2] = Root1;
+	}
+}
+
+
+int main() 
+{
+	int N;
+	scanf("%d", &N);
+
+	int sumBird = 0, parent[MAX];
+	for (int i = 0; i < MAX; i++)
+		parent[i] = -1;
+	for (int i = 0; i < N; i++) {
+		
+		int k,id;
+		scanf("%d%d", &k, &id);
+		if (id > sumBird)
+			sumBird = id;
+
+		for (int j = 0; j < k - 1; j++) {
+			int temp;
+			scanf("%d", &temp);
+			Union(parent, id, temp);
+			if (temp > sumBird)
+				sumBird = temp;
+		}
+
+	}
+
+	int sumTree = 0;
+	for (int i = 1; i <= sumBird; i++) {
+		if (parent[i] < 0)
+			sumTree++;
+	}
+	printf("%d %d\n", sumTree, sumBird);
+
+
+	scanf("%d", &N);
+
+	for (int i = 0; i < N; i++) {
+		int a, b;
+		scanf("%d%d", &a, &b);
+
+		a = find(parent, a);
+		b = find(parent, b);
+		if (a == b)
+			printf("Yes\n");
+		else
+			printf("No\n");
+	}
+
+	return 0;
+}
